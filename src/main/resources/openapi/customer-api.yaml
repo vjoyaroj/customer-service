@@ -1,0 +1,207 @@
+openapi: 3.0.3
+info:
+  title: Customer Service API
+  description: Microservice for managing bank customers
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081/api/v1
+
+paths:
+
+  /customers:
+
+    post:
+      summary: Create a customer
+      operationId: createCustomer
+      tags:
+        - Customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '201':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+    get:
+      summary: Listar clientes activos
+      description: Devuelve únicamente clientes con status ACTIVE.
+      operationId: findAllCustomers
+      tags:
+        - Customer
+      responses:
+        '200':
+          description: Lista de clientes activos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+
+  /customers/{id}:
+
+    get:
+      summary: Find customer by id
+      operationId: findCustomerById
+      tags:
+        - Customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Customer not found
+
+    put:
+      summary: Update customer
+      operationId: updateCustomer
+      tags:
+        - Customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '200':
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+    delete:
+      summary: Baja lógica de cliente
+      description: No elimina el documento; establece status en INACTIVE.
+      operationId: deleteCustomer
+      tags:
+        - Customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Cliente dado de baja (INACTIVE)
+
+components:
+
+  schemas:
+
+    CustomerProfile:
+      type: string
+      description: >
+        Perfil del cliente. PERSONAL y VIP son segmento persona;
+        ENTERPRISE y PYME son segmento empresa.
+      enum:
+        - PERSONAL
+        - ENTERPRISE
+        - VIP
+        - PYME
+
+    Customer:
+
+      type: object
+      properties:
+
+        id:
+          type: string
+          description: UUID of the customer
+
+        firstName:
+          type: string
+
+        lastName:
+          type: string
+
+        companyName:
+          type: string
+
+        documentNumber:
+          type: string
+
+        documentType:
+          type: string
+          enum:
+            - DNI
+            - RUC
+            - PASSPORT
+
+        customerProfile:
+          $ref: '#/components/schemas/CustomerProfile'
+
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+
+        createdAt:
+          type: string
+          format: date-time
+
+
+    CustomerRequest:
+
+      type: object
+
+      required:
+        - documentNumber
+        - documentType
+        - customerProfile
+
+      properties:
+
+        firstName:
+          type: string
+
+        lastName:
+          type: string
+
+        companyName:
+          type: string
+
+        documentNumber:
+          type: string
+
+        documentType:
+          type: string
+          enum:
+            - DNI
+            - RUC
+            - PASSPORT
+
+        customerProfile:
+          $ref: '#/components/schemas/CustomerProfile'
+
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
